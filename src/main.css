@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.swv-dropdown {
+  @apply w-full;
+}
+
+.swv-button {
+  /* @apply rounded-full w-full; */
+  @apply rounded-full;
+}
+
+.swv-button-trigger {
+  @apply bg-orange-500 justify-center text-white !important; /* white font for connecting text*/
+}
+
+.swv-dropdown-list {
+  @apply top-auto bottom-full md:top-full md:bottom-auto md:left-0 md:right-auto;
+}
+
+.swv-dropdown-list-active {
+  @apply transform -translate-y-3 md:translate-y-3;
+}
