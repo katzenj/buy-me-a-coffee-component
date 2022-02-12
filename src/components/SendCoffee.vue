@@ -90,7 +90,10 @@ const onSendCoffeeClick = async () => {
         class="w-96 rounded-2xl border-x border-y shadow-lg px-10 py-8 pb-10"
       >
         <div class="flex justify-between pl-2 pb-4">
-          <wallet-multi-button dark></wallet-multi-button>
+          <div class="connected-button">
+            <wallet-multi-button dark></wallet-multi-button>
+          </div>
+
           <i
             class="pt-2 hover:cursor-pointer fa-solid fa-xmark fa-lg"
             @click="showModal = false"
@@ -211,47 +214,23 @@ const onSendCoffeeClick = async () => {
 </template>
 
 <style>
-/* .modal-mask {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: table;
-  transition: opacity 0.3s ease;
+.swv-button-trigger {
+  background-color: white !important;
+  color: black;
+}
+.swv-button:hover,
+.swv-button-trigger:hover {
+  background-color: white;
+  color: black;
+  cursor: pointer;
+}
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
 }
 
-.modal-container {
-  width: 400px;
-  margin: 0px auto;
-  padding: 20px 30px;
-  background-color: #fff;
-  border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-  transition: all 0.8s ease;
-} */
-/*
- * The following styles are auto-applied to elements with
- * transition="modal" when their visibility is toggled
- * by Vue.js.
- *
- * You can easily play with the modal transition by editing
- * these styles.
- */
-
-.modal-enter-from {
+.v-enter-from,
+.v-leave-to {
   opacity: 0;
-}
-
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  -webkit-transform: scale(1.1);
-  transform: scale(1.1);
 }
 </style>
