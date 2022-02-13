@@ -1,5 +1,5 @@
 <script setup>
-import { initWorkspace } from "../composables";
+import { initWorkspace } from "../composables/index";
 initWorkspace();
 </script>
 

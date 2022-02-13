@@ -7,7 +7,7 @@ import {
   useAutoResizeTextarea,
   useCountCharacterLimit,
   useWorkspace,
-} from "../composables";
+} from "../composables/index";
 
 // Props.
 const props = defineProps({
