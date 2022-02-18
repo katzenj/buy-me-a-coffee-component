@@ -3,6 +3,7 @@ import { ref, computed, toRefs } from "vue";
 import { WalletMultiButton, useWallet } from "solana-wallets-vue";
 import { initWorkspace } from "../composables/index";
 import { sendCoffee } from "../api/send-coffee";
+import LoadingSpinnerVue from "./LoadingSpinner.vue";
 import {
   useAutoResizeTextarea,
   useCountCharacterLimit,
@@ -50,6 +51,9 @@ const characterLimitColour = computed(() => {
   return "text-gray-400";
 });
 
+// Loading.
+const loading = ref(false);
+
 // Permissions.
 const { connected } = useWallet();
 const canSendCoffee = computed(
@@ -65,15 +69,26 @@ const showModal = ref(false);
 
 const onSendCoffeeClick = async () => {
   if (!canSendCoffee.value) return;
-  await sendCoffee(
-    workspace,
-    address.value,
-    effectiveAmount.value,
-    content.value
-  );
-  amount.value = "";
-  content.value = "";
-  showModal.value = false;
+  loading.value = true;
+  let err = false;
+  try {
+    await sendCoffee(
+      workspace,
+      address.value,
+      effectiveAmount.value,
+      content.value
+    );
+  } catch (e) {
+    err = true;
+    loading.value = false;
+  }
+
+  if (!err) {
+    amount.value = "";
+    content.value = "";
+    showModal.value = false;
+    loading.value = false;
+  }
 };
 </script>
 
@@ -102,6 +117,7 @@ const onSendCoffeeClick = async () => {
           @click="showModal = false"
         ></i>
       </div>
+
       <!-- If not connected, we want to make it look like a button and all that jazz. -->
       <div v-if="!connected">
         <div class="text-right">
@@ -118,7 +134,11 @@ const onSendCoffeeClick = async () => {
           <wallet-multi-button dark></wallet-multi-button>
         </div>
       </div>
-      <div v-if="connected">
+
+      <div v-if="loading" class="flex flex-col items-center">
+        <loading-spinner-vue />
+      </div>
+      <div v-if="connected && !loading">
         <div class="border-2 p-4 rounded-2xl mb-4">
           <!-- Content field. -->
           <textarea
