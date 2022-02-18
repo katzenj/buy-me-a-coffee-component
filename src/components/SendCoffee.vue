@@ -80,7 +80,7 @@ const onSendCoffeeClick = async () => {
 <template>
   <div v-if="!showModal">
     <button
-      class="text-white px-4 py-2 rounded-full font-semibold bg-orange-500"
+      class="text-white px-6 py-3 rounded-full font-semibold bg-orange-500"
       @click="showModal = true"
     >
       Send a coffee

@@ -1,7 +1,12 @@
-# Vue 3 + Vite
+# Send a Coffee (with Sol)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+_Devnet only_
 
-## Recommended IDE Setup
+Add the ability for people to send you a "coffee" and a message by adding this
+component to your site. Add the component to your app, pass your Solana address
+to the component, and watch as people send you coffees and kind words!
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+**Note** This is not yet available on npm, so you can't actually add it easily
+yet.
+
+## Usage
