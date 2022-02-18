@@ -22,7 +22,6 @@ export const initWorkspace = () => {
       })
   );
   const program = computed(() => new Program(idl, programID, provider.value));
-
   workspace = {
     wallet,
     connection,

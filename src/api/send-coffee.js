@@ -15,9 +15,5 @@ export const sendCoffee = async ({ wallet, program }, to, amount, content) => {
     signers: [message],
   });
 
-  // const messageAccount = await program.value.account.message.fetch(
-  //   message.publicKey
-  // );
-
   return true;
 };

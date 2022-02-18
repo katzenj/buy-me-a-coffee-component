@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, toRefs } from "vue";
 import { WalletMultiButton, useWallet } from "solana-wallets-vue";
-import WorkspaceProvider from "./WorkspaceProvider.vue";
+import { initWorkspace } from "../composables/index";
 import { sendCoffee } from "../api/send-coffee";
 import {
   useAutoResizeTextarea,
@@ -15,6 +15,9 @@ const props = defineProps({
 });
 
 const { address } = toRefs(props);
+
+// Initialize workspace.
+initWorkspace();
 
 // Amount Input.
 const amount = ref("");
@@ -62,7 +65,7 @@ const showModal = ref(false);
 
 const onSendCoffeeClick = async () => {
   if (!canSendCoffee.value) return;
-  const message = await sendCoffee(
+  await sendCoffee(
     workspace,
     address.value,
     effectiveAmount.value,
@@ -75,162 +78,109 @@ const onSendCoffeeClick = async () => {
 </script>
 
 <template>
-  <workspace-provider>
-    <div v-if="!showModal">
-      <button
-        class="text-white px-4 py-2 rounded-full font-semibold bg-orange-500"
-        @click="showModal = true"
-      >
-        Send a coffee
-      </button>
-    </div>
+  <div v-if="!showModal">
+    <button
+      class="text-white px-4 py-2 rounded-full font-semibold bg-orange-500"
+      @click="showModal = true"
+    >
+      Send a coffee
+    </button>
+  </div>
 
-    <Transition v-if="showModal" name="modal">
-      <div
-        class="w-96 rounded-2xl border-x border-y shadow-lg px-10 py-8 pb-10"
-      >
-        <div class="flex justify-between pl-2 pb-4">
-          <div class="connected-button">
-            <wallet-multi-button dark></wallet-multi-button>
-          </div>
-
+  <Transition v-if="showModal" name="modal">
+    <div class="w-96 rounded-2xl border-x border-y shadow-lg px-10 py-8 pb-10">
+      <!--
+          If connected, we want to make it look more like a tertiary button so it doesn't
+          distract/take away from the Send Coffee button.
+         -->
+      <div v-if="connected" class="flex justify-between pb-4">
+        <div class="-mt-4 connected-button">
+          <wallet-multi-button dark></wallet-multi-button>
+        </div>
+        <i
+          class="pt-2 hover:cursor-pointer fa-solid fa-xmark fa-lg"
+          @click="showModal = false"
+        ></i>
+      </div>
+      <!-- If not connected, we want to make it look like a button and all that jazz. -->
+      <div v-if="!connected">
+        <div class="text-right">
           <i
             class="pt-2 hover:cursor-pointer fa-solid fa-xmark fa-lg"
             @click="showModal = false"
           ></i>
         </div>
-        <div v-if="connected">
-          <div class="border-2 p-4 rounded-2xl mb-4">
-            <!-- Content field. -->
-            <textarea
-              ref="textarea"
-              rows="1"
-              class="text-lg w-full focus:outline-none resize-none mb-3"
-              placeholder="*Say something nice*"
-              v-model="content"
-            ></textarea>
 
-            <!-- Character limit. -->
-            <div class="text-right" :class="characterLimitColour">
-              {{ characterLimit }} left
-            </div>
-          </div>
-
-          <div class="flex flex-wrap items-center justify-between -m-2">
-            <!-- Coffee Input field. -->
-            <div class="relative m-2 mr-4">
-              <input
-                type="number"
-                step="0.01"
-                placeholder="0.02"
-                class="text-grey-500 w-32 rounded-full pl-4 pr-4 py-2 bg-gray-100 text-right"
-                :value="effectiveAmount"
-                @input="amount = $event.target.value"
-              />
-              <div
-                class="absolute left-0 inset-y-0 flex pl-3 pr-2 items-center"
-              >
-                <p class="pb-0.5">◎</p>
-              </div>
-            </div>
-            <div class="flex items-center space-x-6 m-2 ml-auto">
-              <!-- Send Message button. -->
-              <button
-                class="text-white px-4 py-2 rounded-full font-semibold"
-                :disabled="!canSendCoffee"
-                :class="
-                  canSendCoffee
-                    ? 'bg-orange-500'
-                    : 'bg-orange-300 cursor-not-allowed'
-                "
-                @click="onSendCoffeeClick"
-              >
-                Send Coffee
-              </button>
-            </div>
-          </div>
+        <div class="flex flex-col items-center pt-8 not-connected-button">
+          <p class="pb-8 text-center text-lg">
+            Connect your Solana wallet to get started! ☕️
+          </p>
+          <wallet-multi-button dark></wallet-multi-button>
         </div>
       </div>
-    </Transition>
-    <div v-if="false">
-      <div class="pl-2">
-        <wallet-multi-button dark></wallet-multi-button>
-      </div>
       <div v-if="connected">
-        <div class="px-8 py-4 border-b">
-          <div class="border-2 p-4 rounded-2xl mb-4">
-            <!-- Content field. -->
-            <textarea
-              ref="textarea"
-              rows="1"
-              class="text-lg w-full focus:outline-none resize-none mb-3"
-              placeholder="*Say something nice*"
-              v-model="content"
-            ></textarea>
+        <div class="border-2 p-4 rounded-2xl mb-4">
+          <!-- Content field. -->
+          <textarea
+            ref="textarea"
+            rows="1"
+            class="text-lg w-full focus:outline-none resize-none mb-3"
+            placeholder="*Say something nice*"
+            v-model="content"
+          ></textarea>
 
-            <!-- Character limit. -->
-            <div class="text-right" :class="characterLimitColour">
-              {{ characterLimit }} left
+          <!-- Character limit. -->
+          <div class="text-right" :class="characterLimitColour">
+            {{ characterLimit }} left
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between -m-2">
+          <!-- Coffee Input field. -->
+          <div class="relative m-2 mr-4">
+            <input
+              type="number"
+              step="0.01"
+              placeholder="0.02"
+              class="text-grey-500 w-32 rounded-full pl-4 pr-4 py-2 bg-gray-100 text-right"
+              :value="effectiveAmount"
+              @input="amount = $event.target.value"
+            />
+            <div class="absolute left-0 inset-y-0 flex pl-3 pr-2 items-center">
+              <p class="pb-0.5">◎</p>
             </div>
           </div>
-
-          <div class="flex flex-wrap items-center justify-between -m-2">
-            <!-- Coffee Input field. -->
-            <div class="relative m-2 mr-4">
-              <input
-                type="number"
-                step="0.01"
-                placeholder="0.02"
-                class="text-grey-500 w-32 rounded-full pl-4 pr-4 py-2 bg-gray-100 text-right"
-                :value="effectiveAmount"
-                @input="amount = $event.target.value"
-              />
-              <div
-                class="absolute left-0 inset-y-0 flex pl-3 pr-2 items-center"
-              >
-                <p class="pb-0.5">◎</p>
-              </div>
-            </div>
-            <div class="flex items-center space-x-6 m-2 ml-auto">
-              <!-- Send Message button. -->
-              <button
-                class="text-white px-4 py-2 rounded-full font-semibold"
-                :disabled="!canSendCoffee"
-                :class="
-                  canSendCoffee
-                    ? 'bg-orange-500'
-                    : 'bg-orange-300 cursor-not-allowed'
-                "
-                @click="onSendCoffeeClick"
-              >
-                Send Coffee
-              </button>
-            </div>
+          <div class="flex items-center space-x-6 m-2 ml-auto">
+            <!-- Send Message button. -->
+            <button
+              class="text-white px-4 py-2 rounded-full font-semibold"
+              :disabled="!canSendCoffee"
+              :class="
+                canSendCoffee
+                  ? 'bg-orange-500'
+                  : 'bg-orange-300 cursor-not-allowed'
+              "
+              @click="onSendCoffeeClick"
+            >
+              Send Coffee
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </workspace-provider>
+  </Transition>
 </template>
 
 <style>
-.swv-button-trigger {
+.connected-button .swv-button-trigger {
   background-color: white !important;
   color: black;
+  padding: 0;
 }
-.swv-button:hover,
-.swv-button-trigger:hover {
+.connected-button .swv-button:hover,
+.connected-button .swv-button-trigger:hover {
   background-color: white;
   color: black;
   cursor: pointer;
-}
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
 }
 </style>
